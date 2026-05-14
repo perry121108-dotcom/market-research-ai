@@ -5,7 +5,17 @@ import ReportView from "@/components/ReportView";
 import type { ChartData } from "@/components/ReportView";
 
 const COUNTRIES = ["台灣", "日本", "美國", "東南亞", "韓國", "香港", "中國大陸"];
-const CHANNELS = ["蝦皮 Shopee", "momo 購物", "Amazon", "Pinkoi", "LINE 禮物", "實體門市", "小紅書", "自營官網"];
+
+const CHANNELS_BY_COUNTRY: Record<string, string[]> = {
+  "台灣":   ["蝦皮 Shopee", "momo 購物", "Pinkoi", "LINE 禮物", "實體門市", "自營官網"],
+  "日本":   ["Amazon JP", "樂天市場", "Yahoo! ショッピング", "ZOZOTOWN", "實體門市", "自營官網"],
+  "美國":   ["Amazon US", "eBay", "Etsy", "Walmart", "實體門市", "自營官網"],
+  "東南亞": ["Shopee", "Lazada", "TikTok Shop", "Tokopedia", "實體門市", "自營官網"],
+  "韓國":   ["Coupang", "Naver 쇼핑", "11번가", "Kakao 쇼핑", "實體門市", "自營官網"],
+  "香港":   ["HKTVmall", "Carousell", "Amazon HK", "實體門市", "自營官網"],
+  "中國大陸": ["淘寶 / 天貓", "京東", "拼多多", "小紅書", "抖音電商", "實體門市", "自營官網"],
+};
+
 const PURPOSES = ["採購評估", "商品開發", "競品分析", "給主管的報告", "選品決策"];
 
 const STORAGE_KEY = "ms_access_unlocked";
@@ -13,8 +23,13 @@ const STORAGE_KEY = "ms_access_unlocked";
 export default function Home() {
   const [product, setProduct] = useState("");
   const [country, setCountry] = useState("台灣");
-  const [channel, setChannel] = useState("蝦皮 Shopee");
+  const [channel, setChannel] = useState(CHANNELS_BY_COUNTRY["台灣"][0]);
   const [purpose, setPurpose] = useState("商品開發");
+
+  const handleCountryChange = (newCountry: string) => {
+    setCountry(newCountry);
+    setChannel(CHANNELS_BY_COUNTRY[newCountry]?.[0] ?? "自營官網");
+  };
   const [isPaid, setIsPaid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState("");
@@ -132,7 +147,7 @@ export default function Home() {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">國家 / 地區</label>
                 <select
                   value={country}
-                  onChange={(e) => setCountry(e.target.value)}
+                  onChange={(e) => handleCountryChange(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   disabled={loading}
                 >
@@ -150,7 +165,7 @@ export default function Home() {
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   disabled={loading}
                 >
-                  {CHANNELS.map((c) => (
+                  {(CHANNELS_BY_COUNTRY[country] ?? []).map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>

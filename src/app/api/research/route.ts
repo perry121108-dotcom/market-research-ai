@@ -50,6 +50,17 @@ export async function POST(req: NextRequest) {
 
   const isWebChannel = channel.includes("官網") || channel.includes("網站");
 
+  const reviewSourcesByCountry: Record<string, string> = {
+    "台灣":   "PTT、Dcard、Mobile01、蝦皮評論、momo 評論",
+    "日本":   "価格.com、Amazon JP 評論、Yahoo 知恵袋、楽天レビュー",
+    "美國":   "Reddit、Amazon 評論、G2、Trustpilot、Yelp",
+    "東南亞": "Shopee / Lazada 評論、Facebook 社團、TikTok 留言",
+    "韓國":   "Naver 카페、Coupang 評論、네이버 블로그",
+    "香港":   "HKTVmall 評論、Carousell、香港討論區（HKDiscuss）、Facebook 社團",
+    "中國大陸": "小紅書、淘寶/天貓評論、微博、知乎、抖音留言",
+  };
+  const reviewSources = reviewSourcesByCountry[country] ?? "公開論壇與電商平台評論";
+
   const scorecardDimensions: Record<string, string[]> = {
     "採購評估":   ["價格符合預算", "功能符合需求", "易用性", "在地化支援", "資料安全合規", "替換成本（低分=鎖定風險高）"],
     "商品開發":   ["市場需求強度", "痛點明確度", "差異化機會", "競爭激烈度（低分=競爭越激烈）", "開發可行性", "趨勢方向"],
@@ -78,7 +89,7 @@ export async function POST(req: NextRequest) {
 - 電商平台銷量容易被刷單，請勿引用絕對銷量數字
 - 改用相對描述：「X品牌出現頻率最高」、「多個論壇提及」
 - 價格可引用具體數字但標明「平台標示售價」
-- 情感比例以「約 X% 正面 / Y% 負面」估算，並在括號內標明主要估算來源，例如：「（來源：PTT、Dcard、G2 等公開評論估算）」
+- 情感比例以「約 X% 正面 / Y% 負面」估算，並在括號內標明主要估算來源，例如：「（來源：${reviewSources} 等公開評論估算）」
 
 【第一步】請先輸出以下 JSON，用三個反引號包住，標籤為 chart-data：
 
@@ -119,9 +130,9 @@ export async function POST(req: NextRequest) {
 
 ## 🏆 競品分析
 
-競品表格需包含以下欄位。情感比例欄請標明估算來源（如 PTT、Dcard、G2、Trustpilot 等），並註明為公開評論估算，非平台官方評分：
+競品表格需包含以下欄位。情感比例欄請標明估算來源（${reviewSources}），並註明為公開評論估算，非平台官方評分：
 
-| 競品/品牌 | ${channel} 售價區間 | 提及熱度 | 評論情感（來源：公開論壇估算） | 適合客群 | 主要優勢 | 弱點 |
+| 競品/品牌 | ${channel} 售價區間 | 提及熱度 | 評論情感（來源：公開評論估算） | 適合客群 | 主要優勢 | 弱點 |
 |---------|--------------|--------|--------|--------|--------|------|
 
 ## 👥 客群對應推薦
