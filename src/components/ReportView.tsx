@@ -498,7 +498,7 @@ export default function ReportView({ report, product, market, chartData, isPaid 
 
       {/* 文字報告 */}
       <div
-        className="prose prose-gray max-w-none p-8 prose-headings:text-gray-900 prose-h1:text-2xl prose-h2:text-lg prose-h2:border-b prose-h2:border-gray-200 prose-h2:pb-2 prose-table:text-sm"
+        className="prose prose-gray max-w-none p-8 prose-headings:text-gray-900 prose-h1:text-2xl prose-h2:text-lg prose-h2:border-b prose-h2:border-gray-200 prose-h2:pb-2 prose-table:text-sm prose-td:text-xs prose-th:text-xs"
         dangerouslySetInnerHTML={{ __html: html }}
       />
 
