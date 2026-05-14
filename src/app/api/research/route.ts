@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   const isWebChannel = channel.includes("官網") || channel.includes("網站");
 
   const reviewSourcesByCountry: Record<string, string> = {
-    "台灣":   "PTT、Dcard、Mobile01、蝦皮評論、momo 評論",
+    "台灣":   "PTT、Dcard、Mobile01、巴哈姆特、痞客邦、UrCosme、蝦皮評論、momo 評論",
     "日本":   "価格.com、Amazon JP 評論、Yahoo 知恵袋、楽天レビュー",
     "美國":   "Reddit、Amazon 評論、G2、Trustpilot、Yelp",
     "東南亞": "Shopee / Lazada 評論、Facebook 社團、TikTok 留言",

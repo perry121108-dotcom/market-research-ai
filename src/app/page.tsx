@@ -7,7 +7,7 @@ import type { ChartData } from "@/components/ReportView";
 const COUNTRIES = ["台灣", "日本", "美國", "東南亞", "韓國", "香港", "中國大陸"];
 
 const CHANNELS_BY_COUNTRY: Record<string, string[]> = {
-  "台灣":   ["蝦皮 Shopee", "momo 購物", "Pinkoi", "LINE 禮物", "實體門市", "自營官網"],
+  "台灣":   ["蝦皮 Shopee", "momo 購物", "PChome", "Pinkoi", "LINE 禮物", "實體門市", "自營官網"],
   "日本":   ["Amazon JP", "樂天市場", "Yahoo! ショッピング", "ZOZOTOWN", "實體門市", "自營官網"],
   "美國":   ["Amazon US", "eBay", "Etsy", "Walmart", "實體門市", "自營官網"],
   "東南亞": ["Shopee", "Lazada", "TikTok Shop", "Tokopedia", "實體門市", "自營官網"],
