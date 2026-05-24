@@ -63,51 +63,12 @@ className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-900 plac
 {report&&<ReportView report={report} product={product} market={market}/>}</div></main>);}
 `,"utf8");
 console.log("✅ src/app/page.tsx");
-// route.ts
-fs.mkdirSync("src/app/api/research",{recursive:true});
-fs.writeFileSync("src/app/api/research/route.ts",`import{GoogleGenerativeAI}from"@google/generative-ai";
-import{NextRequest,NextResponse}from"next/server";
-export async function POST(req:NextRequest){
-const apiKey=process.env.GEMINI_API_KEY;
-if(!apiKey)return NextResponse.json({error:"伺服器設定錯誤，請聯絡管理員"},{status:500});
-const genAI=new GoogleGenerativeAI(apiKey);
-const{product,market,purpose}=await req.json();
-if(!product||!market||!purpose)return NextResponse.json({error:"缺少必要欄位"},{status:400});
-const model=genAI.getGenerativeModel({model:"gemini-2.5-flash",tools:[{googleSearch:{}}]as any});
-const today=new Date().toLocaleDateString("zh-TW");
-const prompt=\`你是一位專業的市場調研分析師。請使用 Google Search 搜尋最新資料，用繁體中文輸出完整市場調研報告。
-
-商品/品類：\${product}
-目標市場：\${market}
-調研用途：\${purpose}
-
----
-# \${product} 市場調研報告
-**目標市場：** \${market} ｜ **用途：** \${purpose} ｜ **資料時間：** \${today}
-
-## 📊 市場概況
-## 👥 目標客群
-## 🏆 競品分析
-| 競品/品牌 | 目前售價 | 主要優勢 | 弱點 |
-|---------|--------|--------|------|
-| | | | |
-## 💰 市場價格帶
-## ⭐ 熱賣賣點
-## ❌ 負評與痛點
-## 🚀 開發機會
-## ⚠️ 採購風險
-## 📐 建議規格
----
-## 📋 給主管的一頁摘要
-**結論：**
-**三大機會：** 1. 2. 3.
-**三大風險：** 1. 2. 3.
-**建議行動：**
----
-*本報告由 MarketScout AI 結合 Google Search 即時資料生成*\`;
-try{const result=await model.generateContent(prompt);return NextResponse.json({report:result.response.text()});}
-catch(err){console.error(err);return NextResponse.json({error:"AI 分析失敗，請稍後再試"},{status:500});}}`,"utf8");
-console.log("✅ src/app/api/research/route.ts");
+// route.ts —— 不再由本鷹架腳本產生（清理過時重複的 Prompt）。
+// 此 API route 與其市場調研 Prompt 已改為正式維護，並為單一事實來源：
+//   - 程式：src/app/api/research/route.ts（功能較此舊版更完整）
+//   - Prompt：prompts/市場調研分析師.txt
+// 為避免覆蓋正式版並消除重複的過時 Prompt，setup 不再重新產生此檔。
+console.log("⏭️  略過 route.ts（已由正式版與 prompts/市場調研分析師.txt 維護）");
 // ReportView
 fs.mkdirSync("src/components",{recursive:true});
 fs.writeFileSync("src/components/ReportView.tsx",`"use client";
