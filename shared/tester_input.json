@@ -1,0 +1,14 @@
+{
+  "bootstrap": {
+    "spec_version": "0.4.0",
+    "bootstrapped_at": "2026-05-26T09:59:33.567Z"
+  },
+  "latest_compiled_payload": {
+    "compiled_at": "2026-05-26T10:00:58.344Z",
+    "gate_role": "Builder",
+    "source_section": "2026-05-26T18:00:00Z — Builder Session：agent-core 治理層自舉",
+    "next_role": "Tester",
+    "prompts_directory_path": "prompts",
+    "evidence_log_chars": 1060
+  }
+}

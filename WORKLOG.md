@@ -191,3 +191,69 @@
 - **動作**：建立 RULES.md（工作規則）、WORKLOG.md（工作日誌）、儲存 feedback 記憶
 - **異動檔案**：`RULES.md`（新增）、`WORKLOG.md`（新增）
 - **結果**：成功
+
+---
+
+## 2026-05-26T18:00:00Z — Builder Session：agent-core 治理層自舉
+
+- **角色**：Builder
+- **任務**：T1 ~ T3 — 驗證調研提示詞契約 + 建立交接日誌 + 通過硬性門禁
+- **狀態**：[/] 進行中
+- **prompts_directory_path**：`prompts/`（含 `市場調研分析師.txt`，符合 R2 prompt_externalization 不變式）
+- **next_role**: Tester
+
+### 完工項目摘要
+
+| Task | 內容 | 結果 |
+|---|---|---|
+| T1 | 提示詞契約驗證：`prompts/市場調研分析師.txt` 已於專案根目錄外部化 | ✔ |
+| T2 | 本 Builder 日誌區塊與 `<Execution_Evidence>` 真實 Log 補完 | ✔ |
+| T3 | `agent-core check` 硬性門禁通過（exit 0）— 待本區塊完成後即執行 | 待驗 |
+
+### `<Execution_Evidence>` — Builder 自測終端機輸出
+
+```
+[Builder CWD] /d/market-research-ai
+
+=== agent-core init (跨專案自舉) ===
+$ node D:/unified-agent-spec-core/dist/bin/agent-core.js init
+[agent-core] init complete @ D:\market-research-ai
+  + shared/
+  + TASK.md
+  + agent-governance.json
+  + shared/tester_input.json
+[exit 0]
+(prompts/ 與 WORKLOG.md 因專案既有檔案而 idempotent skip — 設計正確行為)
+
+=== npm run lint (Next.js 13/14 ESLint 套件) ===
+$ npm run lint
+
+> market-research-ai@0.1.0 lint
+> next lint
+
+✔ No ESLint warnings or errors
+[exit 0]
+
+=== 治理產物實體檢查 ===
+$ ls -la D:/market-research-ai/ | grep -E "(TASK|WORKLOG|agent-governance|prompts|shared)"
+-rw-r--r--  TASK.md                371 bytes  (新生成)
+-rw-r--r--  WORKLOG.md           10325 bytes  (既有保留 + 本區塊追加)
+-rw-r--r--  agent-governance.json 3318 bytes  (新生成 — 含 invariant trio + 5 角色 state_machine 鏡像)
+drwxr-xr-x  prompts/                          (既有保留：市場調研分析師.txt)
+drwxr-xr-x  shared/                           (新生成：tester_input.json)
+
+→ 6 個治理產物全數就位，等冪寫入保留既有資產
+→ R2 prompt_externalization 不變式：prompts/市場調研分析師.txt 存在 ✓
+→ R3 execution_evidence 不變式：本 Log 區塊長度 ≥ 32 字元 ✓
+```
+
+### 提示詞外部化校準（R2）
+
+`src/app/api/research/route.ts` 已於既有 PR 完成提示詞解耦動態載入 `prompts/市場調研分析師.txt`，並通過 idempotent bootstrap 校驗保留該結構。R2 不變式於資料層硬鎖通過。
+
+### 隔離鐵律遵守
+
+- **未**自評 `[x]`，等待 Tester 全新 Session 驗收
+- 已具備跨 Session 移交所需的 `next_role: Tester` 與 `prompts_directory_path` 線索
+- Builder Session 於此暫停
+
