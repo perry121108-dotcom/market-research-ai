@@ -95,6 +95,17 @@ function topCompetitor(list: CompetitorData[]) {
   return [...pool].sort((a, b) => b.mentionScore - a.mentionScore)[0];
 }
 
+function audienceLabel(audience: AudienceFilter) {
+  switch (audience) {
+    case "sme":
+      return "????";
+    case "enterprise":
+      return "????";
+    default:
+      return "????";
+  }
+}
+
 function recommendationText(level?: string) {
   switch (level) {
     case "go":
@@ -110,7 +121,7 @@ function recommendationText(level?: string) {
   }
 }
 
-function KpiCards({ data, competitors }: { data: ChartData; competitors: CompetitorData[] }) {
+function KpiCards({ data, competitors, audience }: { data: ChartData; competitors: CompetitorData[]; audience: AudienceFilter }) {
   const list = competitors.length > 0 ? competitors : data.competitors;
   const top = topCompetitor(list);
   const href = competitorHref(top);
@@ -120,11 +131,17 @@ function KpiCards({ data, competitors }: { data: ChartData; competitors: Competi
   const total = data.sentiment.positive + data.sentiment.negative + data.sentiment.neutral || 100;
   const positivePct = Math.round((data.sentiment.positive / total) * 100);
   const latestTrend = [...(data.trendScore ?? [])].sort((a, b) => a.year.localeCompare(b.year)).at(-1)?.score;
+  const sourceText = top?.evidenceSummary || top?.whyRecommended || (href ? "????????????" : "????????????????");
 
   return (
     <div className="grid gap-3 md:grid-cols-4 mb-4">
-      <div className="bg-white rounded-lg border border-gray-200 px-4 py-3">
-        <p className="text-xs text-gray-500 mb-1">首推競品</p>
+      <div className="bg-white rounded-lg border border-blue-200 px-4 py-3 md:col-span-2">
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <p className="text-xs text-gray-500">????</p>
+          <span className="text-[11px] rounded-full bg-blue-50 px-2 py-0.5 font-medium text-blue-700">
+            ? {audienceLabel(audience)} ??
+          </span>
+        </div>
         {href ? (
           <a href={href} target="_blank" rel="noreferrer" className="text-lg font-bold text-blue-700 leading-tight break-words hover:underline">
             {competitorTitle(top)}
@@ -132,22 +149,27 @@ function KpiCards({ data, competitors }: { data: ChartData; competitors: Competi
         ) : (
           <p className="text-lg font-bold text-gray-900 leading-tight break-words">{competitorTitle(top)}</p>
         )}
-        <p className="text-xs text-gray-400 mt-1">熱度 {top?.mentionScore ?? 0}/10{href ? " · 已附依據連結" : " · 缺連結需人工確認"}</p>
+        <p className="text-xs text-gray-500 mt-1">?? {top?.mentionScore ?? 0}/10 ? {sourceText}</p>
+        {href && (
+          <a href={href} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-xs font-semibold text-blue-600 hover:underline">
+            ??????
+          </a>
+        )}
       </div>
       <div className="bg-white rounded-lg border border-gray-200 px-4 py-3">
-        <p className="text-xs text-gray-500 mb-1">市場需求熱度</p>
+        <p className="text-xs text-gray-500 mb-1">??????</p>
         <p className="text-lg font-bold text-gray-900">{scoreLabel(latestTrend)}</p>
-        <p className="text-xs text-gray-400 mt-1">固定標準，不隨用途改變</p>
+        <p className="text-xs text-gray-400 mt-1">???????????</p>
       </div>
       <div className="bg-white rounded-lg border border-gray-200 px-4 py-3">
-        <p className="text-xs text-gray-500 mb-1">平均價格帶</p>
+        <p className="text-xs text-gray-500 mb-1">?????</p>
         <p className="text-lg font-bold text-gray-900">NT$ {avgPrice.toLocaleString()}</p>
-        <p className="text-xs text-gray-400 mt-1">依目前競品價格估算</p>
+        <p className="text-xs text-gray-400 mt-1">?????????</p>
       </div>
-      <div className="bg-white rounded-lg border border-gray-200 px-4 py-3">
-        <p className="text-xs text-gray-500 mb-1">正向聲量</p>
+      <div className="bg-white rounded-lg border border-gray-200 px-4 py-3 md:col-span-4 lg:col-span-1">
+        <p className="text-xs text-gray-500 mb-1">????</p>
         <p className="text-lg font-bold text-gray-900">{positivePct}%</p>
-        <p className="text-xs text-gray-400 mt-1">由評論與討論摘要估算</p>
+        <p className="text-xs text-gray-400 mt-1">??????????</p>
       </div>
     </div>
   );
@@ -539,8 +561,6 @@ export default function ReportView({ report, product, market, chartData, isPaid 
           </div>
 
           <div ref={dashboardRef} className="bg-slate-50 p-2">
-            <KpiCards data={chartData} competitors={filteredCompetitors} />
-            <DecisionSummary data={chartData} />
             {!isExporting && (
               <GlobalFilters
                 timeRange={timeRange} setTimeRange={setTimeRange}
@@ -548,6 +568,8 @@ export default function ReportView({ report, product, market, chartData, isPaid 
                 excludeOutliers={excludeOutliers} setExcludeOutliers={setExcludeOutliers}
               />
             )}
+            <KpiCards data={chartData} competitors={filteredCompetitors} audience={audience} />
+            <DecisionSummary data={chartData} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {chartData.priceRange && (
                 <PriceChart data={chartData.priceRange} activeCompetitor={activeCompetitor} competitors={filteredCompetitors} isExporting={isExporting} />
