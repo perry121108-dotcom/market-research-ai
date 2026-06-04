@@ -4,6 +4,55 @@ import { readFile } from "fs/promises";
 import path from "path";
 
 const MAX_LEN = 200;
+function toNumber(value: unknown, fallback = 0) {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function hasEvidenceUrl(competitor: Record<string, unknown>) {
+  return Boolean(
+    competitor.officialUrl ||
+    competitor.marketplaceUrl ||
+    (Array.isArray(competitor.evidenceUrls) && competitor.evidenceUrls.length > 0)
+  );
+}
+
+function normalizeChartData(input: unknown) {
+  if (typeof input !== "object" || input === null) return null;
+  const data = input as Record<string, unknown>;
+  const competitors = Array.isArray(data.competitors)
+    ? data.competitors
+        .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
+        .map((item) => ({
+          ...item,
+          name: typeof item.name === "string" && item.name.trim() ? item.name : "待確認競品",
+          minPrice: toNumber(item.minPrice),
+          maxPrice: toNumber(item.maxPrice),
+          mentionScore: toNumber(item.mentionScore),
+          evidenceUrls: Array.isArray(item.evidenceUrls) ? item.evidenceUrls.filter((url) => typeof url === "string" && url.trim()) : [],
+        }))
+        .sort((a, b) => Number(hasEvidenceUrl(b)) - Number(hasEvidenceUrl(a)) || b.mentionScore - a.mentionScore)
+    : [];
+
+  return {
+    ...data,
+    competitors,
+    trendBasis: {
+      standard: "market_demand_heat_v1",
+      description: "市場需求熱度固定以搜尋需求、通路能見度、評論討論、競品活動加權估算，不隨調研用途改變。",
+      weights: { searchDemand: 35, commerceVisibility: 25, reviewDiscussion: 20, competitorActivity: 20 },
+      ...(typeof data.trendBasis === "object" && data.trendBasis !== null ? data.trendBasis : {}),
+    },
+    saturationScore: toNumber(data.saturationScore),
+    purposeFitScore: toNumber(data.purposeFitScore),
+    developmentRecommendation:
+      typeof data.developmentRecommendation === "object" && data.developmentRecommendation !== null
+        ? data.developmentRecommendation
+        : {
+            level: "validate_first",
+            summary: "市場熱度代表需求存在；是否適合開發仍需同時看飽和度、價格壓力、差異化空間與開發成本。",
+          },
+  };
+}
 
 function isNonEmptyString(v: unknown): v is string {
   return typeof v === "string" && v.trim().length > 0;
@@ -118,7 +167,7 @@ export async function POST(req: NextRequest) {
 
     if (chartMatch) {
       try {
-        chartData = JSON.parse(chartMatch[1].trim());
+        chartData = normalizeChartData(JSON.parse(chartMatch[1].trim()));
         report = text.replace(/```chart-data[\s\S]*?```\s*/, "").trim();
       } catch {
         // keep full text as report if JSON parse fails

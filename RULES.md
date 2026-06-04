@@ -14,7 +14,7 @@ This project uses a QA-driven workflow. Do not rely only on chat context. Read t
 Current latest QA log:
 
 ```text
-docs/qa-logs/2026-05-13_qa-log-03.md
+docs/qa-logs/2026-06-04_qa-log.md
 ```
 
 ## Non-Negotiable Rules
@@ -31,7 +31,7 @@ docs/qa-logs/2026-05-13_qa-log-03.md
 Claude must use the modification table in:
 
 ```text
-docs/qa-logs/2026-05-13_qa-log.md
+docs/qa-logs/2026-06-04_qa-log.md
 ```
 
 Fix items by QA ID, then report:

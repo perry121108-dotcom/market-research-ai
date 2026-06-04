@@ -181,3 +181,52 @@
 
 ---
 *本報告由 MarketScout AI 結合 Google Search 即時資料生成。*
+## QA 強制規則：市場熱度、用途適配與競品依據
+
+以下規則優先於前文，必須套用在報告與 chart-data：
+
+1. 市場需求熱度 `trendScore` 必須採固定標準 `market_demand_heat_v1`，分數範圍 0-100，不得因 `{{purpose}}` 不同而改變同一商品的市場熱度。
+2. `trendScore` 加權標準：搜尋需求與近期成長 35%、通路/電商能見度 25%、評論與社群討論 20%、競品活動與品牌存在感 20%。
+3. `{{purpose}}` 只能影響用途適配、開發建議、風險解讀與行動建議，不得拿來重算市場需求熱度。
+4. 若選品熱度高但開發建議低，必須明確說明：需求存在，但可能因市場飽和、價格競爭、差異化不足、供應鏈或開發成本過高而不建議直接開發。
+5. 首推競品必須附可查證依據。沒有 officialUrl、marketplaceUrl 或 evidenceUrls 的品牌，不得列為首推競品，只能列在「待確認競品」。
+6. 報告必須包含「指標判讀說明」、「市場熱度 vs 用途適配」、「首推競品依據與連結」三個段落。
+
+chart-data JSON 必須在既有欄位外新增或保留以下欄位：
+
+```json
+{
+  "trendBasis": {
+    "standard": "market_demand_heat_v1",
+    "description": "市場需求熱度固定以搜尋需求、通路能見度、評論討論、競品活動加權估算，不隨調研用途改變。",
+    "weights": {
+      "searchDemand": 35,
+      "commerceVisibility": 25,
+      "reviewDiscussion": 20,
+      "competitorActivity": 20
+    }
+  },
+  "saturationScore": 0,
+  "purposeFitScore": 0,
+  "developmentRecommendation": {
+    "level": "go | differentiate | validate_first | avoid",
+    "summary": "用一句話說明是否適合開發，以及原因。"
+  },
+  "competitors": [
+    {
+      "name": "品牌名",
+      "productName": "商品名",
+      "modelName": "型號或系列，沒有則填 null",
+      "officialUrl": "官方網址，沒有則 null",
+      "marketplaceUrl": "商品頁或搜尋結果頁，沒有則 null",
+      "evidenceUrls": ["至少 1 個可查證網址"],
+      "evidenceSummary": "為什麼列入此競品",
+      "whyRecommended": "推薦為首推或參考競品的理由",
+      "confidence": "high | medium | low",
+      "minPrice": 0,
+      "maxPrice": 0,
+      "mentionScore": 1
+    }
+  ]
+}
+```
