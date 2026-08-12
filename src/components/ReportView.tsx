@@ -98,11 +98,11 @@ function topCompetitor(list: CompetitorData[]) {
 function audienceLabel(audience: AudienceFilter) {
   switch (audience) {
     case "sme":
-      return "????";
+      return "中低價客群";
     case "enterprise":
-      return "????";
+      return "高價客群";
     default:
-      return "????";
+      return "全部客群";
   }
 }
 
@@ -131,15 +131,15 @@ function KpiCards({ data, competitors, audience }: { data: ChartData; competitor
   const total = data.sentiment.positive + data.sentiment.negative + data.sentiment.neutral || 100;
   const positivePct = Math.round((data.sentiment.positive / total) * 100);
   const latestTrend = [...(data.trendScore ?? [])].sort((a, b) => a.year.localeCompare(b.year)).at(-1)?.score;
-  const sourceText = top?.evidenceSummary || top?.whyRecommended || (href ? "????????????" : "????????????????");
+  const sourceText = top?.evidenceSummary || top?.whyRecommended || (href ? "已附競品依據連結，可點擊查看" : "缺少可驗證連結，建議人工確認來源");
 
   return (
     <div className="grid gap-3 md:grid-cols-4 mb-4">
       <div className="bg-white rounded-lg border border-blue-200 px-4 py-3 md:col-span-2">
         <div className="flex items-center justify-between gap-2 mb-1">
-          <p className="text-xs text-gray-500">????</p>
+          <p className="text-xs text-gray-500">首推競品</p>
           <span className="text-[11px] rounded-full bg-blue-50 px-2 py-0.5 font-medium text-blue-700">
-            ? {audienceLabel(audience)} ??
+            依 {audienceLabel(audience)} 推薦
           </span>
         </div>
         {href ? (
@@ -149,27 +149,27 @@ function KpiCards({ data, competitors, audience }: { data: ChartData; competitor
         ) : (
           <p className="text-lg font-bold text-gray-900 leading-tight break-words">{competitorTitle(top)}</p>
         )}
-        <p className="text-xs text-gray-500 mt-1">?? {top?.mentionScore ?? 0}/10 ? {sourceText}</p>
+        <p className="text-xs text-gray-500 mt-1">熱度 {top?.mentionScore ?? 0}/10 · {sourceText}</p>
         {href && (
           <a href={href} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-xs font-semibold text-blue-600 hover:underline">
-            ??????
+            查看競品依據
           </a>
         )}
       </div>
       <div className="bg-white rounded-lg border border-gray-200 px-4 py-3">
-        <p className="text-xs text-gray-500 mb-1">??????</p>
+        <p className="text-xs text-gray-500 mb-1">市場需求熱度</p>
         <p className="text-lg font-bold text-gray-900">{scoreLabel(latestTrend)}</p>
-        <p className="text-xs text-gray-400 mt-1">???????????</p>
+        <p className="text-xs text-gray-400 mt-1">固定標準，不隨用途改變</p>
       </div>
       <div className="bg-white rounded-lg border border-gray-200 px-4 py-3">
-        <p className="text-xs text-gray-500 mb-1">?????</p>
+        <p className="text-xs text-gray-500 mb-1">平均價格帶</p>
         <p className="text-lg font-bold text-gray-900">NT$ {avgPrice.toLocaleString()}</p>
-        <p className="text-xs text-gray-400 mt-1">?????????</p>
+        <p className="text-xs text-gray-400 mt-1">依目前競品價格估算</p>
       </div>
       <div className="bg-white rounded-lg border border-gray-200 px-4 py-3 md:col-span-4 lg:col-span-1">
-        <p className="text-xs text-gray-500 mb-1">????</p>
+        <p className="text-xs text-gray-500 mb-1">正向聲量</p>
         <p className="text-lg font-bold text-gray-900">{positivePct}%</p>
-        <p className="text-xs text-gray-400 mt-1">??????????</p>
+        <p className="text-xs text-gray-400 mt-1">由評論與討論摘要估算</p>
       </div>
     </div>
   );
